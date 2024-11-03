@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch-Thai Vokabel-App</title>
+    <style>
+        /* Einfaches Styling für die Karte */
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        .card { border: 1px solid #ccc; padding: 20px; margin: 20px auto; max-width: 300px; }
+        .word { font-size: 1.5em; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Deutsch-Thai Vokabeln</h1>
+    <div class="card">
+        <div class="word" id="germanWord">Lädt...</div>
+        <div class="translation" id="thaiWord"></div>
+        <div class="transliteration" id="transliteration"></div>
+        <button onclick="playAudio()">Audio abspielen</button>
+        <br><br>
+        <button onclick="nextWord()">Nächstes Wort</button>
+    </div>
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        // Setze hier die URL zur Google Sheets JSON-API ein
+        const sheetURL = "https://spreadsheets.google.com/feeds/list/2PACX-1vTC5AgB-40-_ApB7eYA9qC12tbzPLuPtHZBn2j0RqYiAdePCar2mrKlJo8T4jGN8i8pF-IOM_Uc-Xsx/1/public/values?alt=json";
+
+        // Daten von Google Sheets abrufen
+        fetch(sheetURL)
+            .then(response => response.json())
+            .then(data => {
+                // Sheets-Daten in ein einfaches Format umwandeln
+                window.vocabulary = data.feed.entry.map(entry => ({
+                    german: entry.gsx$deutsch.$t,
+                    thai: entry.gsx$thai.$t,
+                    transliteration: entry.gsx$transliteration.$t,
+                    audio: entry.gsx$audio.$t
+                }));
+                displayWord();
+            })
+            .catch(error => {
+                console.error("Fehler beim Abrufen der Daten:", error);
+                document.getElementById("germanWord").innerText = "Fehler beim Laden der Daten.";
+            });
+
+        let currentWordIndex = 0;
+
+        function displayWord() {
+            if (window.vocabulary && window.vocabulary.length > 0) {
+                const word = window.vocabulary[currentWordIndex];
+                document.getElementById("germanWord").innerText = word.german || "";
+                document.getElementById("thaiWord").innerText = word.thai || "";
+                document.getElementById("transliteration").innerText = word.transliteration || "";
+                document.getElementById("audioPlayer").src = word.audio || "";
+            } else {
+                console.warn("Keine Vokabeln verfügbar.");
+                document.getElementById("germanWord").innerText = "Keine Vokabeln verfügbar.";
+            }
+        }
+
+        function nextWord() {
+            if (window.vocabulary && window.vocabulary.length > 0) {
+                currentWordIndex = (currentWordIndex + 1) % window.vocabulary.length;
+                displayWord();
+            }
+        }
+
+        function playAudio() {
+            const audioElement = document.getElementById("audioPlayer");
+            if (audioElement.src) {
+                audioElement.play();
+            }
+        }
+    </script>
+</body>
+</html>
