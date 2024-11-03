@@ -24,21 +24,14 @@
     <audio id="audioPlayer"></audio>
 
     <script>
-        // Setze hier die URL zur Google Sheets JSON-API ein
-       const sheetURL = "https://spreadsheets.google.com/feeds/list/2PACX-1vTC5AgB-40-_ApB7eYA9qC12tbzPLuPtHZBn2j0RqYiAdePCar2mrKlJo8T4jGN8i8pF-IOM_Uc-Xsx/1/public/values?alt=json";
+        // Verwende die direkte URL zur JSON-Datei in deinem GitHub-Repository
+        const sheetURL = "https://raw.githubusercontent.com/Batoui-ops/deutsch-thai-app/main/vocabulary.json";
 
-
-        // Daten von Google Sheets abrufen
+        // Daten von der JSON-Datei abrufen
         fetch(sheetURL)
             .then(response => response.json())
             .then(data => {
-                // Sheets-Daten in ein einfaches Format umwandeln
-                window.vocabulary = data.feed.entry.map(entry => ({
-                    german: entry.gsx$deutsch.$t,
-                    thai: entry.gsx$thai.$t,
-                    transliteration: entry.gsx$transliteration.$t,
-                    audio: entry.gsx$audio.$t
-                }));
+                window.vocabulary = data;
                 displayWord();
             })
             .catch(error => {
